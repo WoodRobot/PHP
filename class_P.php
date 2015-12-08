@@ -45,7 +45,6 @@ class P{
 	function p_con(){
     $dsn = 'mysql:host = localhost;dbname=test';
     $db = new PDO($dsn, 'root', 'root');
-	$db -> beginTransaction();
 	$db -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); //设置可捕获异常
 	$db -> exec("SET NAMES 'UTF8'");
 	return $db;
@@ -59,8 +58,15 @@ class P{
 	$val = substr($val,0,strlen($val)-1);
 	$val = $val.")";
 	for($i = 0; $i < count($data); $i++){
-	$this -> safe($val, 1, $data[$i], $this -> is($data[$i]));
+		$sha1 = strpos($data[$i],'/safe');
+		if($sha1){
+			$this -> safe($val, 1,sha1($data[$i]), $this -> is($data[$i]));
+		}else{
+			$this -> safe($val, 1, $data[$i], $this -> is($data[$i]));
+		}
+	
 	}
+	$this -> sql -> beginTransaction();
 	try{
 	$res = $this -> sql -> exec($val);
 	$this -> sql -> commit();
@@ -83,6 +89,7 @@ class P{
 	for($i = 0; $i < count($data)/2; $i++){
     $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
 	}
+	$this -> sql -> beginTransaction();
 	try{
 	$res = $this -> sql -> exec($val);
 	$this -> sql -> commit();
@@ -105,6 +112,7 @@ class P{
 	for($i = 0; $i < count($data)/2; $i++){
     $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
 	}
+	$this -> sql -> beginTransaction();
 	try{
     $res = $this -> sql -> query($val) -> fetchAll(PDO::FETCH_ASSOC);
 	$this -> sql -> commit();
@@ -124,7 +132,12 @@ class P{
 	}
 	$s = substr($s,0,strlen($s)-1);
 	for($i = 0; $i < count($set)/2; $i++){
-    $this -> safe($s, 1, $set[$i+$i+1], $this -> is($set[$i+$i+1]));
+		$sha1 = strpos($set[$i+$i+1],'/safe');
+		if($sha1){
+			$this -> safe($s, 1,sha1($set[$i+$i+1]), $this -> is($set[$i+$i+1]));
+		}else{
+			$this -> safe($s, 1, $set[$i+$i+1], $this -> is($set[$i+$i+1]));
+		}
 	}
 	
 	$val = $s." where ";
@@ -137,9 +150,11 @@ class P{
 	}
 	$val = substr($val,0,strlen($val)-2);
 	for($i = 0; $i < count($data)/2; $i++){
-    $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
-	}
+			$this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
 
+	
+	}
+    $this -> sql -> beginTransaction();
 	try{
     $res = $this -> sql -> query($val);
 	$this -> sql -> commit();
