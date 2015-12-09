@@ -241,9 +241,9 @@ class P{
 	for($i = 0; $i < count($set)/2; $i++){
 		$sha1 = strpos($set[$i+$i+1],'/safe');
 		if($sha1){
-			$this -> safe($s, 1,sha1($set[$i+$i+1]), $this -> is($set[$i+$i+1]));
+			$s = $this -> safe($s, 1,sha1($set[$i+$i+1]), $this -> is($set[$i+$i+1]));
 		}else{
-			$this -> safe($s, 1, $set[$i+$i+1], $this -> is($set[$i+$i+1]));
+			$s = $this -> safe($s, 1, $set[$i+$i+1], $this -> is($set[$i+$i+1]));
 		}
 	}
 	
@@ -262,6 +262,7 @@ class P{
 	
 	}
 	try{
+	
     $res = @$this -> sql -> query($val);
 	return true;
 	}catch(PDOexception $err){
