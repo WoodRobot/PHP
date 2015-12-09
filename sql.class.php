@@ -21,12 +21,14 @@ class P{
 	//配置数据库信息
 	protected $user = 'root';
 	protected $pwd = 'root';
-	protected $db = 'bt';
-	//-------------------------------------
+	protected $db = 'test';
+	// define -------------------------------------
+	
     function __construct() {
     @$this -> sql = $this -> p_con();
     }
-	//-------------------------------------
+	// function safe construct-------------------------------------
+	
 	function is($value){
 		if(is_int($value)){
 			return 'INT';
@@ -45,7 +47,8 @@ class P{
 		}
 		return '';
 	}
-	//-------------------------------------
+	// function is -------------------------------------
+	
 	function safe($sql, $location, $var, $type, $b = false){
 		switch($type){
 			default:
@@ -69,14 +72,17 @@ class P{
 			    $var = (int)$var;
 			    break;
 		 }// switch
-		if($b = true){
+		if($b == true){
 			 return $var;
 		}
 		for ($i=1; $i <= $location; $i++){
 			$pos = strpos($sql, '?');
 		}// for
 		$sql = substr($sql, 0, $pos) .$var .substr($sql, $pos+1);
-	}// function safe --------------------------------------
+		return $sql;
+	}
+	// function safe --------------------------------------
+	
 	function p_con(){
     $dsn = 'mysql:host = localhost;dbname='.$this -> db;
     $db = new PDO($dsn, $this -> user , $this -> pwd);
@@ -84,7 +90,8 @@ class P{
 	$db -> query("SET NAMES 'UTF8'");
 	return $db;
 	}
-	//-------------------------------------
+	// function con -------------------------------------
+	
 	function p_sql($value = array(),$return = false,$sw = true){
 	if(empty($value)){
     return false;
@@ -145,7 +152,9 @@ class P{
 		
 	}
 	
-	}// function p_sql --------------------------------------
+	}
+	// function p_sql --------------------------------------
+	
 	function p_add($db, $data = array()){
 	$val = "INSERT INTO $db VALUES (";
 	for($i = 0; $i < count($data); $i++){
@@ -156,22 +165,21 @@ class P{
 	for($i = 0; $i < count($data); $i++){
 		$sha1 = strpos($data[$i],'/safe');
 		if($sha1){
-			$this -> safe($val, 1,sha1($data[$i]), $this -> is($data[$i]));
+			 $val = $this -> safe($val, 1,sha1($data[$i]), $this -> is($data[$i]));
 		}else{
-			$this -> safe($val, 1, $data[$i], $this -> is($data[$i]));
+			 $val = $this -> safe($val, 1, $data[$i], $this -> is($data[$i]));
 		}
 	
 	}
-	//@$this -> sql -> beginTransaction();
 	try{
 	$res = @$this -> sql -> query($val);
-	//@$this -> sql -> commit();
 	return true;
 	}catch(PDOexception $err){
-	//@$this -> sql -> rollBack();
 	return false;
 	}
-	}// function p_add --------------------------------------
+	}
+	// function p_add --------------------------------------
+	
 	function p_del($db, $data = array()){
 	$val = "DELETE FROM $db where ";
 	for($i = 0; $i < count($data); $i++){
@@ -183,18 +191,17 @@ class P{
 	}
     $val = substr($val,0,strlen($val)-2);
 	for($i = 0; $i < count($data)/2; $i++){
-    $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
+     $val = $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
 	}
-	//@$this -> sql -> beginTransaction();
 	try{
 	$res = @$this -> sql -> query($val);
-	//@$this -> sql -> commit();
 	return true;
 	}catch(PDOexception $err){
-	//@$this -> sql -> rollBack();
 	return false;
 	}
-	}// function p_del --------------------------------------
+	}
+	// function p_del --------------------------------------
+	
 	function p_search($db, $data = array()){
 	if(empty($data)){
 	$val = "SELECT * FROM $db";
@@ -211,18 +218,17 @@ class P{
 	}
     $val = substr($val,0,strlen($val)-2);
 	for($i = 0; $i < count($data)/2; $i++){
-    $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
+    $val =  $val = $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
 	}
-	//@$this -> sql -> beginTransaction();
 	try{
     $res = @$this -> sql -> query($val) -> fetchAll(PDO::FETCH_ASSOC);
-	//@$this -> sql -> commit();
 	return $res;
 	}catch(PDOexception $err){
-	//@$this -> sql -> rollBack();
 	return false;
 	}
-	}// function p_search --------------------------------------
+	}
+	// function p_search --------------------------------------
+	
 	function p_edit($db,$set = array(),$data = array()){
 	for($i = 0,$times = 0,$s = "UPDATE $db "; $i < count($set); $i++){
 		if($times == 0){
@@ -251,20 +257,18 @@ class P{
 	}
 	$val = substr($val,0,strlen($val)-2);
 	for($i = 0; $i < count($data)/2; $i++){
-			$this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
+			 $val = $this -> safe($val, 1, $data[$i+$i+1], $this -> is($data[$i+$i+1]));
 
 	
 	}
-    //@$this -> sql -> beginTransaction();
 	try{
     $res = @$this -> sql -> query($val);
-	//@$this -> sql -> commit();
 	return true;
 	}catch(PDOexception $err){
-	//@$this -> sql -> rollBack();
 	return false;
 	}
-	}// function p_edit --------------------------------------
+	}
+	// function p_edit --------------------------------------
 
 	
 }//class End
