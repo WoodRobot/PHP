@@ -52,8 +52,10 @@ class P{
 	function safe($sql, $location, $var, $type, $b = false){
 		switch($type){
 			default:
-			    $val = 'OUT';
-				die();
+			    $var = addslashes($var);
+			    $var = addcslashes($var,'(.)./.-.=.;.*');
+				$var = "'".$var."'";
+				break;
 			case 'STRING':
 			    $var = addslashes($var);
 			    $var = addcslashes($var,'(.)./.-.=.;.*');
@@ -63,11 +65,9 @@ class P{
 			    $var = (int)$var;
 			    break;
 			case 'ARRAY':
-			    $val = 'OUT';
-				die();
+				break;
 			case 'BOOL':
-			    $val = 'OUT';
-				die();
+			    if($type){$val = 1;}else{$val = 0;}
 			case 'INT':
 			    $var = (int)$var;
 			    break;
@@ -103,7 +103,7 @@ class P{
 
     
 	if($return == false){
-		
+
 		try{
 			for ($m=0; $m<$u; $m++){
 				$j = substr_count($value [$m],'{');
@@ -127,7 +127,9 @@ class P{
 	    }
 		
 	}else{
+
 		try{
+			
 			for ($m=0; $m<$u; $m++){
 				$j = substr_count($value [$m],'{');
 				for ($i=1; $i <= $j; $i++){
@@ -140,8 +142,8 @@ class P{
 					$var = $this -> safe('','',$val,$this -> is($val),true);
 					$value [$m]= $head.$var.$foot;
 				}// for
-			
-			$res [$m]= @$this -> sql -> query($value [$m]) -> fetchAll(PDO::FETCH_ASSOC);
+				$re = @$this -> sql -> query($value [$m]);
+				$res [$m] = $re -> fetchAll(PDO::FETCH_ASSOC);
 			}
 	    if($sw == true){@$this -> sql -> commit();}
 	    return $res;
@@ -149,8 +151,11 @@ class P{
 	        if($sw == true){@$this -> sql -> rollBack();}
 	        return false;
 	    }
+			
 		
 	}
+	
+	
 	
 	}
 	// function p_sql --------------------------------------
